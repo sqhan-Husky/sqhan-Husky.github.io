@@ -17,17 +17,17 @@
     <title>论文阅读_A Survey of Machine Learning for Big Code and Naturalness</title>
     <url>/2020/08/05/Big-code-survey/</url>
     <content><![CDATA[<blockquote>
-<p>NLP技术发展至今，在代码领域的挖掘也逐步深入，近期针对Code Naturalness阅读了一些论文和技术，于是想从这篇比较全面的<a href="https://arxiv.org/abs/1709.06182v1">survey</a>入手，梳理一下整个代码处理的发展史，形成一个整体概念。<br>我比较喜欢提纲式的整理，因此原文的内容可能较少，会加入一些自己的逻辑。</p>
+<p>NLP技术发展至今，在代码领域的挖掘也逐步深入，近期针对Code Naturalness阅读了一些论文和技术，于是想从这篇比较全面的<a href="https://arxiv.org/abs/1709.06182v1">survey</a>入手，梳理一下整个代码处理的发展史，形成一个整体概念。<br>本人比较喜欢提纲式的整理，因此原文的内容可能较少，会加入一些自己的逻辑。</p>
 </blockquote>
 <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><strong>Objective</strong> —— <em>There is therefore an ongoing demand for innovations in software tools that help make software more reliable and maintainable.</em></p>
-<p>生活的方方面面都依赖着高质量软件的可靠操作，但是软件的维护是代价大复杂程度高且耗时的过程，<br>这就要求着工具的不断改进来降低软件的复杂度，同时帮助工程师更好的维护代码。</p>
+<p>生活的方方面面都依赖着高质量软件的可靠操作，但是软件的维护是代价大复杂程度高且耗时的过程，这就要求着工具的不断改进来降低软件的复杂度，同时帮助工程师更好的维护代码。</p>
 <p><strong>Big Code</strong> —— <em>The scale of available data is massive.</em></p>
-<p>系统源码的庞大，各类元数据(authorship, bug-fixes, reviews)的繁多，暗示了一种新的数据驱动的开发软件工具的办法：<br>在大型且有代表性的软件集上进行统计分布估算，从而能在大多数情况下取得好的结果。</p>
+<p>系统源码的庞大，各类元数据(authorship, bug-fixes, reviews)的繁多，暗示了一种新的数据驱动的开发软件工具的办法：在大型且有代表性的软件集上进行统计分布估算，从而能在大多数情况下取得好的结果。</p>
 <blockquote>
-<p>原文中，后两个概念出现在第二块中，但我把它们提到前面来，更有利于理解和串联。</p>
+<p>原文中，后两个概念出现在第二块中，但我把它们提到前面来，进行简要的阐释。如果想要更详细的内容，请阅读原论文~</p>
 </blockquote>
 <p><strong>The Naturalness Hypothesis</strong> —— <em>Software is a form of human communication; software corpora have similar statistical properties to natural language corpora; and these properties can be exploited to build better software engineering tools.</em></p>
-<p>软件是人类交流的一种形式，软件语料库具有和自然语言语料库相似的统计特征，这些特征可以利用在建立更好的软件工具上。<br>基于这个假设，就可以使用机器学习的方法来设计模型学习开发者们是如何写代码使用代码的。</p>
+<p>软件是人类交流的一种形式，软件语料库具有和自然语言语料库相似的统计特征，这些特征可以利用在建立更好的软件工具上。基于这个假设，就可以使用机器学习的方法来设计模型学习开发者们是如何写代码使用代码的。</p>
 <p><strong>Code Predictability</strong> —— <em>Code is conventional, idiomatic, and familiar.</em></p>
 <p>代码书写存在规律性和习惯性，因此概率统计模型可以针对代码学习出有效的特征，给出相应任务的反馈。</p>
 <h2 id="Text-Code-and-Machine-Learning"><a href="#Text-Code-and-Machine-Learning" class="headerlink" title="Text, Code and Machine Learning"></a>Text, Code and Machine Learning</h2>]]></content>
@@ -37,6 +37,107 @@
       <tags>
         <tag>paper</tag>
         <tag>Code Naturalness</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【分布式系统_1】 文件系统</title>
+    <url>/2020/08/05/Distributed-System-1/Distributed-System-1/</url>
+    <content><![CDATA[<h3 id="文件系统-FS）"><a href="#文件系统-FS）" class="headerlink" title="文件系统(FS）"></a>文件系统(FS）</h3><pre><code>1. 文件系统概述  
+文件系统：操作系统中负责管理和存取信息的模块  
+• 基本功能：  
+  1）文件的按名存取  
+  2）文件目录的建立和维护  
+  3）实现逻辑文件到物理文件的转换（核心）  
+  4）文件存储空间的分配和管理  
+  5）数据保密、保护和共享  
+  6）提供一组用户使用的操作  
+
+2. 文件与目录
+• 实现按名存取的文件系统的优点：
+  1）将用户从复杂的屋里存储地址管理中解放出来
+  2）可方便地对文件提供各种安全、保密和保护措施
+  3）实现文件的共享（同名共享、异名共享）
+
+• 如何实现按名存取？
+  当用户要求存取某个文件时，系统查找目录文件，获得对应的文件目录
+  在文件目录中，根据用户给定的文件名寻找到对应文件的文件控制块（文件目录项）
+  通过文件控制块所记录的该文件的相关信息依次存取该文件的内容
+
+• 文件目录
+  1）文件目录：建立和维护的关于系统的所有文件的清单
+  2）文件控制块：每个目录项对应一个文件的信息描述（存取控制信息、结构信息、使用信息、管理信息）
+  3）目录文件：目录信息也以文件的形式存放
+
+• 树形目录结构
+
+3. 文件的物理结构
+• 文件在物理存储中的存放方法和组织关系
+  块（物理记录）的划分、记录的排列、索引的组织、信息的搜素
+• 常见的文件物理结构
+  顺序文件（连续存储）；链接文件；索引文件</code></pre>
+<h3 id="分布式文件系统-DFS"><a href="#分布式文件系统-DFS" class="headerlink" title="分布式文件系统(DFS)"></a>分布式文件系统(DFS)</h3><pre><code>1. 体系架构  
+• DFS实现的思路：  
+  1）保证每台机器均可透明地访问其他机器上的文件（通过RPC调用）  
+  2）将所有机器的文件系统关联起来，形成一个对外统一的整体  
+• Client-Server Architectures：文件系统的挂载  
+• Symmetric Architectures：通过特殊的hash算法将文件划分到各台机器上，需要访问文件时可根据hash算法进行定位
+• Cluster-Based Distributed File Systems  
+  主节点进行管理，从节点存储数据  
+  文件切分成块，分散存储在从节点上  
+
+2. 文件访问  
+• 单机多进程访问同一文件：读写锁  
+• 不同机器上进程访问同一文件  
+• 注意临界区问题  
+
+3. 备份与一致性  
+• 客户端备份：Client-Server DFS  
+• 服务器端备份：Cluster-Based DFS  
+
+4. 容错管理  </code></pre>
+<h3 id="Hadoop分布式文件系统-HDFS"><a href="#Hadoop分布式文件系统-HDFS" class="headerlink" title="Hadoop分布式文件系统(HDFS)"></a>Hadoop分布式文件系统(HDFS)</h3><pre><code>1. 设计考量
+• HDFS：Hadoop Distributed File System 分布式文件系统
+• MapReduce：并行计算框架
+• 文件由数据块集合组成，每个数据块在本地文件系统中以单独文件进行存储
+
+2. 体系结构</code></pre>
+<p><img src="/img/202008052.png"></p>
+<pre><code>• NameNode(masters)：每个集群一个名字节点，负责文件系统元数据操作、数据块的复制和定位
+核心数据文件包括：元数据镜像文件、操作日志文件；元数据保存在内存中
+• SecondaryNameNode(backups)：NameNode的备份节点 （防止Log过大回恢复时间过长 冷备份/离线）
+“检查点”：定期从NameNode上下载镜像和日志，合并成新的，在本地保存，并写回NameNode
+• DataNodes(slaves)：集群中每个节点一个数据节点，负责数据块的存储；为客户端提供实际文件数据
+HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，并不占用整个数据块存储空间
+
+3. 文件访问
+• 文件写入HDFS
+  NameNode告知客户端文件的每一个数据块存储在何处，客户端将数据块直接传输到指定的数据节点
+• 数据存放策略（目标：负载均衡，快速访问，容错）
+  三个副本：当前DataNode（快速写入）、不同机架（减少跨rack的网络流量）、相同机架其他节点（应对交换机故障）
+  若有更多副本，随机节点
+• 数据读取策略：从NameNode获得数据块不同副本的存放位置列表，最近者优先原则
+• 文件访问模型：”一次写入多次读取“，不允许更改，仅容许追加；修改内容需删除重新写入;对于单文件只
+               支持并发读，不支持并发写
+  好处：避免读写冲突、无需文件锁
+
+4. 备份与一致性
+• HDFS数据备份优点
+  1）加快数据传输速度
+  2）容易检查数据错误
+  3）保证数据的可靠性
+• 一个文件有若干备份，写入成功的备份之间是强一致的
+
+5. 容错机制
+• DataNode故障：宕机，节点上所有的数据都会标记为不可读
+• 定期检查备份因子：NameNode侦测DataNode故障，数据块自动复制到剩余的节点以保证满足备份因子
+• NameNode故障：根据SecondaryNameNode中得FsImage和Editlog数据进行恢复</code></pre>
+]]></content>
+      <categories>
+        <category>系统</category>
+      </categories>
+      <tags>
+        <tag>分布式</tag>
+        <tag>笔记整理</tag>
       </tags>
   </entry>
 </search>
