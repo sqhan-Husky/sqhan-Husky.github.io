@@ -13,4 +13,30 @@
         <tag>Life</tag>
       </tags>
   </entry>
+  <entry>
+    <title>论文阅读_A Survey of Machine Learning for Big Code and Naturalness</title>
+    <url>/2020/08/05/Big-code-survey/</url>
+    <content><![CDATA[<blockquote>
+<p>NLP技术发展至今，在代码领域的挖掘也逐步深入，近期针对Code Naturalness阅读了一些论文和技术，于是想从这篇比较全面的<a href="https://arxiv.org/abs/1709.06182v1">survey</a>入手，梳理一下整个代码处理的发展史，形成一个整体概念。<br>我比较喜欢提纲式的整理，因此原文的内容可能较少，会加入一些自己的逻辑。</p>
+</blockquote>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><strong>Objective</strong> —— <em>There is therefore an ongoing demand for innovations in software tools that help make software more reliable and maintainable.</em></p>
+<p>生活的方方面面都依赖着高质量软件的可靠操作，但是软件的维护是代价大复杂程度高且耗时的过程，<br>这就要求着工具的不断改进来降低软件的复杂度，同时帮助工程师更好的维护代码。</p>
+<p><strong>Big Code</strong> —— <em>The scale of available data is massive.</em></p>
+<p>系统源码的庞大，各类元数据(authorship, bug-fixes, reviews)的繁多，暗示了一种新的数据驱动的开发软件工具的办法：<br>在大型且有代表性的软件集上进行统计分布估算，从而能在大多数情况下取得好的结果。</p>
+<blockquote>
+<p>原文中，后两个概念出现在第二块中，但我把它们提到前面来，更有利于理解和串联。</p>
+</blockquote>
+<p><strong>The Naturalness Hypothesis</strong> —— <em>Software is a form of human communication; software corpora have similar statistical properties to natural language corpora; and these properties can be exploited to build better software engineering tools.</em></p>
+<p>软件是人类交流的一种形式，软件语料库具有和自然语言语料库相似的统计特征，这些特征可以利用在建立更好的软件工具上。<br>基于这个假设，就可以使用机器学习的方法来设计模型学习开发者们是如何写代码使用代码的。</p>
+<p><strong>Code Predictability</strong> —— <em>Code is conventional, idiomatic, and familiar.</em></p>
+<p>代码书写存在规律性和习惯性，因此概率统计模型可以针对代码学习出有效的特征，给出相应任务的反馈。</p>
+<h2 id="Text-Code-and-Machine-Learning"><a href="#Text-Code-and-Machine-Learning" class="headerlink" title="Text, Code and Machine Learning"></a>Text, Code and Machine Learning</h2>]]></content>
+      <categories>
+        <category>Big Code</category>
+      </categories>
+      <tags>
+        <tag>paper</tag>
+        <tag>Code Naturalness</tag>
+      </tags>
+  </entry>
 </search>
