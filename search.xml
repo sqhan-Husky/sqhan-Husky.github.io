@@ -276,4 +276,37 @@ Map -&gt; 本地磁盘 -&gt; Reduce （I/O浪费、存储浪费）
         <tag>笔记整理</tag>
       </tags>
   </entry>
+  <entry>
+    <title>论文阅读_LEARNING TO REPRESENT PROGRAMS WITH GRAPHS</title>
+    <url>/2020/09/08/ggnn/ggnn/</url>
+    <content><![CDATA[<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在代码上进行任务学习，目前更多的是将自然语言的深度学习方法应用在代码上，这样会存在无法捕捉代码语义信息的问题，例如代码中变量、函数的长依赖在局部是难以学习到的。该文使用图来表达代码的语义和语法结构，使用基于图的深度学习方法来解释代码结构，增加了数据流和类型层级来弥补代码的语义损失。</p>
+<h3 id="研究内容"><a href="#研究内容" class="headerlink" title="研究内容"></a>研究内容</h3><ul>
+<li>如何构建源代码的程序图</li>
+<li>如何将GGNN算法应用到这些大型图上</li>
+</ul>
+<h3 id="评估任务"><a href="#评估任务" class="headerlink" title="评估任务"></a>评估任务</h3><ul>
+<li>VarNaming: 根据变量的用法预测变量名</li>
+<li>VarMisuse: 根据在程序中的定位选择正确的变量名</li>
+</ul>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><h3 id="Graph-Structure"><a href="#Graph-Structure" class="headerlink" title="Graph Structure"></a>Graph Structure</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们用程序图来表示token之间的语法和语义关系，并且用不同类型的边来模拟token间的语法和语义关系。程序图的骨架是程序的抽象语法树(蓝色圆弧节点)，叶子结点表示为源码中的token(黑色方框)，如a图中所示，是”Assert.NotNull(clazz);”的表示。其中，共有两种有向边的形式：蓝线代表语义节点的连接，指向孩子节点；双黑线代表Token间的有序连接，指向下一个Token。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图b是增加的数据流信息，一共有3种边的类型，LastWrite/LastUse/ComputedFrom，表现了控制数据在程序中传递的流向。还有一些特殊的数据流类型用于图的扩展，例如LastLexicalUse, ReturnsTo,FormalArgName等。<br><img src="/2020/09/08/ggnn/ggnn/20200090801.png"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最后一点是，所有的节点和类型都double一下，便于网络中信息快速传播，但增加了模型建立的代价。</p>
+<h3 id="GGNN-Gated-Graph-Nerual-Network"><a href="#GGNN-Gated-Graph-Nerual-Network" class="headerlink" title="GGNN - Gated Graph Nerual Network"></a>GGNN - Gated Graph Nerual Network</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图G = (V,E,X)是由一系列节点V，节点特征X，以及一个有向边集合E组成，共有K个边的类型。  </p>
+<ul>
+<li>将每个节点v的特征表示为一个是指向量x进行编码，再将每个节点与一个状态向量h对应，用x来初始化，状态向量用于在图中传播信息，类型为k的消息会传播给v的邻居，消息是利用状态向量计算的，m=f(h)，这里f选用一个线性函数。  </li>
+<li>通过在同一时间计算所有边的消息，所有的状态都同时被更新。节点v的新状态是通过聚集所有进入的消息来计算的，这里通过一个简单的加和函数作为聚合方法计算新状态m’。  </li>
+<li>给出了聚合后的消息和当前状态的向量，下一时刻的状态h’=GRU(m’. h)，GRU是LSTM的变体，一个门控循环单元。</li>
+</ul>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以上过程重复固定的时间步，然后将最后一步得到的状态向量当做节点的向量表示。  </p>
+<h3 id="Implement"><a href="#Implement" class="headerlink" title="Implement"></a>Implement</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对已知变量的类型信息进行embedding，若未知则定义为”UNKTYPE”标识。节点的初始状态由token和type的语义信息共同决定，token还会被切分为subtoken，然后将每个subtoken的表示取平均来得到token的表示，最后将这个表示和之前的类型表示相连接，通过一个线性层来的到每个节点的初始表示。  </p>
+<p>对于<strong>VarNaming</strong>任务，给定一个程序和一个目标变量，建立上述的程序图并把该变量的名字用<SLOT>替换，为了预测其名字，利用初始节点标签来运行GGNN8个时间步，计算出所有<SLOT>表示的平均值来作为变量的表示，这个表示就被用作一个单层GRU的初始状态，以subtoken的形式预测目标名字。  </SLOT></SLOT></p>
+<p>对于<strong>VarMisuse</strong>任务，需要修改图结构。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>M. Allamanis, M. Brockschmidt, and M. Khademi, “Learning to represent programs with graphs,” in International Conference on Learning Representations, 2018.<br>Y. Li, D. Tarlow, M. Brockschmidt, and R. Zemel, “Gated graph sequence neural networks,” arXiv preprint arXiv:1511.05493, 2015.<br><a href="https://blog.csdn.net/m0_37924639/article/details/80499416">https://blog.csdn.net/m0_37924639/article/details/80499416</a><br><a href="https://zhuanlan.zhihu.com/p/36117802">https://zhuanlan.zhihu.com/p/36117802</a>  </p>
+]]></content>
+      <categories>
+        <category>Big Code</category>
+      </categories>
+      <tags>
+        <tag>paper</tag>
+        <tag>Code Naturalness</tag>
+      </tags>
+  </entry>
 </search>
