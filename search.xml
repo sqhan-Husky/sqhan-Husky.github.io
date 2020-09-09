@@ -277,7 +277,7 @@ Map -&gt; 本地磁盘 -&gt; Reduce （I/O浪费、存储浪费）
       </tags>
   </entry>
   <entry>
-    <title>论文阅读_LEARNING TO REPRESENT PROGRAMS WITH GRAPHS</title>
+    <title>论文阅读_LEARNING TO REPRESENT PROGRAMS WITH GRAPHS(ICLR2016)</title>
     <url>/2020/09/08/ggnn/ggnn/</url>
     <content><![CDATA[<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在代码上进行任务学习，目前更多的是将自然语言的深度学习方法应用在代码上，这样会存在无法捕捉代码语义信息的问题，例如代码中变量、函数的长依赖在局部是难以学习到的。该文使用图来表达代码的语义和语法结构，使用基于图的深度学习方法来解释代码结构，增加了数据流和类型层级来弥补代码的语义损失。</p>
 <h3 id="研究内容"><a href="#研究内容" class="headerlink" title="研究内容"></a>研究内容</h3><ul>
@@ -297,8 +297,18 @@ Map -&gt; 本地磁盘 -&gt; Reduce （I/O浪费、存储浪费）
 </ul>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以上过程重复固定的时间步，然后将最后一步得到的状态向量当做节点的向量表示。  </p>
 <h3 id="Implement"><a href="#Implement" class="headerlink" title="Implement"></a>Implement</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对已知变量的类型信息进行embedding，若未知则定义为”UNKTYPE”标识。节点的初始状态由token和type的语义信息共同决定，token还会被切分为subtoken，然后将每个subtoken的表示取平均来得到token的表示，最后将这个表示和之前的类型表示相连接，通过一个线性层来的到每个节点的初始表示。  </p>
-<p>对于<strong>VarNaming</strong>任务，给定一个程序和一个目标变量，建立上述的程序图并把该变量的名字用<SLOT>替换，为了预测其名字，利用初始节点标签来运行GGNN8个时间步，计算出所有<SLOT>表示的平均值来作为变量的表示，这个表示就被用作一个单层GRU的初始状态，以subtoken的形式预测目标名字。  </SLOT></SLOT></p>
-<p>对于<strong>VarMisuse</strong>任务，需要修改图结构。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对于<strong>VarNaming</strong>任务，给定一个程序和一个目标变量，建立上述的程序图并把该变量的名字用<SLOT>替换，为了预测其名字，利用初始节点标签来运行GGNN 8个时间步，计算出所有<SLOT>表示的平均值来作为变量的表示，这个表示就被用作一个单层GRU的初始状态，以subtoken的形式预测目标名字。  </SLOT></SLOT></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对于<strong>VarMisuse</strong>任务，检测误用即预测是否一致，将想要预测的某位置的token称为槽，从候选变量集合中选择正确的token。该任务需要修改图结构，首先，为了计算槽t的上下文表示 c(t)，我们在t的位置插入一个新的结点v&lt;SLOT&gt; ，当作这里有一个“洞”，然后将它与的剩下部分用除LastUse, LastWrite, LastLexicalUse和GuardedBy边之外的所有边相连。然后，为了计算目标槽的每个候选变量的表示u(t,v)，我们将每个候选集中的v插入图中，然后为它们连LastUse, LastWrite, LastLexicalUse边。利用初始结点的表示加上一个额外候选结点的表示，<br>运行GGNN 8次，得到了结点的最终状态。最后通过argmax来初始节点和额外节点的连接线性层，利用max-margin objective来进行训练。  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实现部分并未涉及到具体的模型细节，例如参数量、subtoken数量、token的embedding方法和超参数的设置等。无参考源码。</p>
+<h1 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h1><h3 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h3><p>该工作为VarMisuse收集了一个开源C#数据集，挑选了Github上星最多且能完整编译的29个不同领域的项目，代码量共计290多万行，并对所有使用变量的位置进行数据收集，过滤掉变量声明。其任务就是从一些类型正确的变量中推断出某位置原本的变量。</p>
+<h3 id="Baselines"><a href="#Baselines" class="headerlink" title="Baselines"></a>Baselines</h3><ul>
+<li>VarNaming: 使用ABGLBL作为基准模型(使用每个变量用法的4个左右上下文标注的对数双线性模型)</li>
+<li>VarMisuse: 使用双向GRU作为基准模型，以AVGBIRNN作为加强版(对变量取平均)</li>
+</ul>
+<h3 id="Quantitative"><a href="#Quantitative" class="headerlink" title="Quantitative"></a>Quantitative</h3><p>两个任务的评估结果：<br><img src="/2020/09/08/ggnn/ggnn/20200090802.png"><br>下图是不同边和结点表示对结果的影响，从表中可以看出如果只保留语法信息会对varNaming任务产生很大影响。<br><img src="/2020/09/08/ggnn/ggnn/20200090803.png"> </p>
+<h3 id="Qualitative"><a href="#Qualitative" class="headerlink" title="Qualitative"></a>Qualitative</h3><p>下图展示了对不同位置的变量名预测的结果：<br><img src="/2020/09/08/ggnn/ggnn/20200090804.png"> </p>
+<p>使用VarMisuse还发现了开源项目中存在的变量命名误用bug，便于修正。</p>
+<h1 id="Conclusions"><a href="#Conclusions" class="headerlink" title="Conclusions"></a>Conclusions</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;虽然源代码在其他学科（如编程语言研究）中有很好的理解和研究，但它是深度学习的一个相对较新的领域。 与文本或知觉数据相比，它提供了新的角度，因为它的（本地）语义是明确定义的，并且可以使用众所周知的高效程序分析来提取丰富的附加信息。 另一方面，整合这些丰富的结构化信息带来了一个有趣的挑战。因为它需要概率地提炼类型系统中包含的标准信息， 我们认为它是学习源代码含义的核心挑战的第一个尝试。</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>M. Allamanis, M. Brockschmidt, and M. Khademi, “Learning to represent programs with graphs,” in International Conference on Learning Representations, 2018.<br>Y. Li, D. Tarlow, M. Brockschmidt, and R. Zemel, “Gated graph sequence neural networks,” arXiv preprint arXiv:1511.05493, 2015.<br><a href="https://blog.csdn.net/m0_37924639/article/details/80499416">https://blog.csdn.net/m0_37924639/article/details/80499416</a><br><a href="https://zhuanlan.zhihu.com/p/36117802">https://zhuanlan.zhihu.com/p/36117802</a>  </p>
 ]]></content>
       <categories>
