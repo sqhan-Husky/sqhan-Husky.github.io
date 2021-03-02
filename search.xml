@@ -73,112 +73,8 @@
       </tags>
   </entry>
   <entry>
-    <title>【分布式系统_1】 文件系统</title>
-    <url>/2020/08/05/Distributed-System-1/Distributed-System-1/</url>
-    <content><![CDATA[<blockquote>
-<p>分布式系统课件1：分布式文件系统，从文件系统入手，进一步介绍分布式文件系统。</p>
-</blockquote>
-<h3 id="文件系统-FS）"><a href="#文件系统-FS）" class="headerlink" title="文件系统(FS）"></a>文件系统(FS）</h3><pre><code>1. 文件系统概述  
-文件系统：操作系统中负责管理和存取信息的模块  
-• 基本功能：  
-  1）文件的按名存取  
-  2）文件目录的建立和维护  
-  3）实现逻辑文件到物理文件的转换（核心）  
-  4）文件存储空间的分配和管理  
-  5）数据保密、保护和共享  
-  6）提供一组用户使用的操作  
-
-2. 文件与目录
-• 实现按名存取的文件系统的优点：
-  1）将用户从复杂的屋里存储地址管理中解放出来
-  2）可方便地对文件提供各种安全、保密和保护措施
-  3）实现文件的共享（同名共享、异名共享）
-
-• 如何实现按名存取？
-  当用户要求存取某个文件时，系统查找目录文件，获得对应的文件目录
-  在文件目录中，根据用户给定的文件名寻找到对应文件的文件控制块（文件目录项）
-  通过文件控制块所记录的该文件的相关信息依次存取该文件的内容
-
-• 文件目录
-  1）文件目录：建立和维护的关于系统的所有文件的清单
-  2）文件控制块：每个目录项对应一个文件的信息描述（存取控制信息、结构信息、使用信息、管理信息）
-  3）目录文件：目录信息也以文件的形式存放
-
-• 树形目录结构
-
-3. 文件的物理结构
-• 文件在物理存储中的存放方法和组织关系
-  块（物理记录）的划分、记录的排列、索引的组织、信息的搜素
-• 常见的文件物理结构
-  顺序文件（连续存储）；链接文件；索引文件</code></pre>
-<h3 id="分布式文件系统-DFS"><a href="#分布式文件系统-DFS" class="headerlink" title="分布式文件系统(DFS)"></a>分布式文件系统(DFS)</h3><pre><code>1. 体系架构  
-• DFS实现的思路：  
-  1）保证每台机器均可透明地访问其他机器上的文件（通过RPC调用）  
-  2）将所有机器的文件系统关联起来，形成一个对外统一的整体  
-• Client-Server Architectures：文件系统的挂载  
-• Symmetric Architectures：通过特殊的hash算法将文件划分到各台机器上，需要访问文件时可根据hash算法进行定位
-• Cluster-Based Distributed File Systems  
-  主节点进行管理，从节点存储数据  
-  文件切分成块，分散存储在从节点上  
-
-2. 文件访问  
-• 单机多进程访问同一文件：读写锁  
-• 不同机器上进程访问同一文件  
-• 注意临界区问题  
-
-3. 备份与一致性  
-• 客户端备份：Client-Server DFS  
-• 服务器端备份：Cluster-Based DFS  
-
-4. 容错管理  </code></pre>
-<h3 id="Hadoop分布式文件系统-HDFS"><a href="#Hadoop分布式文件系统-HDFS" class="headerlink" title="Hadoop分布式文件系统(HDFS)"></a>Hadoop分布式文件系统(HDFS)</h3><pre><code>1. 设计考量
-• HDFS：Hadoop Distributed File System 分布式文件系统
-• MapReduce：并行计算框架
-• 文件由数据块集合组成，每个数据块在本地文件系统中以单独文件进行存储
-
-2. 体系结构</code></pre>
-<p><img src="/img/202008052.png"></p>
-<pre><code>• NameNode(masters)：每个集群一个名字节点，负责文件系统元数据操作、数据块的复制和定位
-核心数据文件包括：元数据镜像文件、操作日志文件；元数据保存在内存中
-• SecondaryNameNode(backups)：NameNode的备份节点 （防止Log过大回恢复时间过长 冷备份/离线）
-“检查点”：定期从NameNode上下载镜像和日志，合并成新的，在本地保存，并写回NameNode
-• DataNodes(slaves)：集群中每个节点一个数据节点，负责数据块的存储；为客户端提供实际文件数据
-HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，并不占用整个数据块存储空间
-
-3. 文件访问
-• 文件写入HDFS
-  NameNode告知客户端文件的每一个数据块存储在何处，客户端将数据块直接传输到指定的数据节点
-• 数据存放策略（目标：负载均衡，快速访问，容错）
-  三个副本：当前DataNode（快速写入）、不同机架（减少跨rack的网络流量）、相同机架其他节点（应对交换机故障）
-  若有更多副本，随机节点
-• 数据读取策略：从NameNode获得数据块不同副本的存放位置列表，最近者优先原则
-• 文件访问模型：”一次写入多次读取“，不允许更改，仅容许追加；修改内容需删除重新写入;对于单文件只
-               支持并发读，不支持并发写
-  好处：避免读写冲突、无需文件锁
-
-4. 备份与一致性
-• HDFS数据备份优点
-  1）加快数据传输速度
-  2）容易检查数据错误
-  3）保证数据的可靠性
-• 一个文件有若干备份，写入成功的备份之间是强一致的
-
-5. 容错机制
-• DataNode故障：宕机，节点上所有的数据都会标记为不可读
-• 定期检查备份因子：NameNode侦测DataNode故障，数据块自动复制到剩余的节点以保证满足备份因子
-• NameNode故障：根据SecondaryNameNode中得FsImage和Editlog数据进行恢复</code></pre>
-]]></content>
-      <categories>
-        <category>系统</category>
-      </categories>
-      <tags>
-        <tag>分布式</tag>
-        <tag>笔记整理</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【分布式系统_2】 MapReduce</title>
-    <url>/2020/08/08/Distributed-System-2/Distributed-System-2/</url>
+    <url>/2020/08/08/Distributed-System-2/</url>
     <content><![CDATA[<h2 id="MapReduce批处理系统"><a href="#MapReduce批处理系统" class="headerlink" title="MapReduce批处理系统"></a>MapReduce批处理系统</h2><ol>
 <li>Hadoop简介 —— Apache下的一个开源分布式计算平台<br> 基于Java语言开发，具有很好的跨平台特性  <ul>
 <li>核心：分布式文件系统HDFS 和 MapReduce  </li>
@@ -187,7 +83,7 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 </ul>
 </li>
 </ol>
-<p><img src="/2020/08/08/Distributed-System-2/Distributed-System-2/202008081.png">  </p>
+<p><img src="/2020/08/08/Distributed-System-2/202008081.png">  </p>
 <ol start="2">
 <li><p>体系结构</p>
 <ul>
@@ -201,7 +97,7 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 </li>
 </ol>
 <ul>
-<li>从节点角度看流程<br><img src="/2020/08/08/Distributed-System-2/Distributed-System-2/202008082.png">  </li>
+<li>从节点角度看流程<br><img src="/2020/08/08/Distributed-System-2/202008082.png">  </li>
 </ul>
 <ol>
 <li>InputFormat: 定义了怎样与物理存储之间的映射，理想的分片大小是一个HDFS块  </li>
@@ -277,8 +173,137 @@ Map -&gt; 本地磁盘 -&gt; Reduce （I/O浪费、存储浪费）
       </tags>
   </entry>
   <entry>
+    <title>CodeSearchDataset</title>
+    <url>/2020/09/24/CodeSearchDataset/</url>
+    <content><![CDATA[<h1 id="Code-Search数据集调研"><a href="#Code-Search数据集调研" class="headerlink" title="Code Search数据集调研"></a>Code Search数据集调研</h1><blockquote>
+<p>Code Search是代码任务中的一项关键问题，根据给出的Query文本匹配最接近的代码回答。例如，”How do i iterate through a hashmap?”，代码搜索模型会在代码语料库中进行搜索，返回匹配的代码段。根据[1]中的统计,近几年对于代码搜索模型的研究逐渐增多，任务对应的数据集也丰富起来，先后出现了多个数据集benchmark，这些benchmark的目的都在于想统一代码搜索任务的评估方式，但也都略有区别。近期对代码搜搜的任务进行了一些调研，在此做一个整理。</p>
+</blockquote>
+<h3 id="CODEnn-DataSet-2018"><a href="#CODEnn-DataSet-2018" class="headerlink" title="CODEnn DataSet (2018)"></a>CODEnn DataSet (2018)</h3><p>CODEnn数据集是DeepCS[2]系统所使用的大规模数据集，包含了代码和对应的文本表述，对应CODEnn模型的输入需要，数据集以&lt;method name, API dequence, tokens, description&gt;元组存储,该数据可在[8]上获取。<br><img src="/2020/09/24/CodeSearchDataset/2020092403.png"><br>CODEnn选取了Stack Overflow上高星的50个有关Java程序的提问，构造了代码搜索的查询测试集。</p>
+<p>由于数据集格式的固定，该数据集只够于以token方式处理代码的模型，因此存在一定的限制。</p>
+<h3 id="Nerual-Neural-Code-Search-Evaluation-Dataset-2019"><a href="#Nerual-Neural-Code-Search-Evaluation-Dataset-2019" class="headerlink" title="Nerual Neural Code Search Evaluation Dataset(2019)"></a>Nerual Neural Code Search Evaluation Dataset(2019)</h3><p>该数据集由Facebook于2019年推出，整个数据集分为三个部分：<br><strong>GitHub存储库</strong><br>由GitHub上近24549个星数最高的Android库的代码片段组成的搜索语料库，包含Python脚本。  </p>
+<p><strong>搜索语料库</strong><br>依靠前面的24549个库，解析其中的方法主体，总共包括4,716,814个。给到自然语言query后，代码搜索模型从中搜索出需要的代码片段。<br>每个方法主体已经给到了包括它的ID、文件路径、起始行、结束行、url等在内的相关信息。<br><img src="/2020/09/24/CodeSearchDataset/2020092404.png">  </p>
+<p><strong>评估数据集</strong><br>包含287个堆栈溢出问答对，包括其ID、问题、答案url、答案几个部分，这些问题来自Stack Exchange。</p>
+<p>目前，该团队基于这个数据集评估了NCS,UNIF两个模型，其中UNIF以简单的模型结构超过了CODEnn在代码搜索任务上的表现。在该数据集上，语料库的作用仅仅是训练代码的表征，当代码和文本使用同一表征模型时适用。如果需要有监督的训练，或进行bi-modal模型的训练，则必须要对语料库增加对应的文本描述。</p>
+<h3 id="CodeSearchNet-2020"><a href="#CodeSearchNet-2020" class="headerlink" title="CodeSearchNet(2020)"></a>CodeSearchNet(2020)</h3><p>GitHub发起了CodeSearchNet挑战赛，以推动用自然语言搜索程序代码的技术发展。CodeSearchNet语料库是一个庞大的程序代码和自然语言批注数据集，让研究人员可用来训练机器学习模型。该数据集收集了大量以Go、Java、JavaScript、PHP、Python和Ruby程序语言撰写的函式数据集，以及其说明文件，官方使用解析器TreeSitter作为基础架构，并发布了数据预处理工作管线，作为其他研究人员在程序代码中应用机器学习的起点。<br>数据集的组成如下图所示：<br><img src="/2020/09/24/CodeSearchDataset/2020092406.png"> </p>
+<p>CodeSearchNet是一个比较完善的代码搜索数据库，且有相对应的评估系统，目前有codebert、code2vec等模型在该数据及上进行代码搜索的任务学习。</p>
+<h3 id="CosBench-2020"><a href="#CosBench-2020" class="headerlink" title="CosBench(2020)"></a>CosBench(2020)</h3><p>tbc…</p>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><p>[1]Are the Code Snippets What We Are Searching for?A Benchmark and an Empirical Study on CodeSearch with Natural-Language Queries<br>[2]Deep Code Search<br>[3]Nerual Neural Code Search Evaluation Dataset<br>[4]<a href="https://zhuanlan.zhihu.com/p/85159018">https://zhuanlan.zhihu.com/p/85159018</a><br>[5]<a href="https://github.com/facebookresearch/Neural-Code-Search-Evaluation-Dataset">https://github.com/facebookresearch/Neural-Code-Search-Evaluation-Dataset</a><br>[6]<a href="https://github.com/github/CodeSearchNet">https://github.com/github/CodeSearchNet</a><br>[7]<a href="https://wandb.ai/github/codesearchnet/benchmark">https://wandb.ai/github/codesearchnet/benchmark</a><br>[8]<a href="https://drive.google.com/drive/folders/1GZYLT_lzhlVczXjD6dgwVUvDDPHMB6L7">https://drive.google.com/drive/folders/1GZYLT_lzhlVczXjD6dgwVUvDDPHMB6L7</a></p>
+]]></content>
+      <categories>
+        <category>Big Code</category>
+      </categories>
+      <tags>
+        <tag>paper</tag>
+        <tag>Code Naturalness</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【分布式系统_1】 文件系统</title>
+    <url>/2020/08/05/Distributed-System-1/</url>
+    <content><![CDATA[<blockquote>
+<p>分布式系统课件1：分布式文件系统，从文件系统入手，进一步介绍分布式文件系统。</p>
+</blockquote>
+<h3 id="文件系统-FS）"><a href="#文件系统-FS）" class="headerlink" title="文件系统(FS）"></a>文件系统(FS）</h3><pre><code>1. 文件系统概述  
+文件系统：操作系统中负责管理和存取信息的模块  
+• 基本功能：  
+  1）文件的按名存取  
+  2）文件目录的建立和维护  
+  3）实现逻辑文件到物理文件的转换（核心）  
+  4）文件存储空间的分配和管理  
+  5）数据保密、保护和共享  
+  6）提供一组用户使用的操作  
+
+2. 文件与目录
+• 实现按名存取的文件系统的优点：
+  1）将用户从复杂的屋里存储地址管理中解放出来
+  2）可方便地对文件提供各种安全、保密和保护措施
+  3）实现文件的共享（同名共享、异名共享）
+
+• 如何实现按名存取？
+  当用户要求存取某个文件时，系统查找目录文件，获得对应的文件目录
+  在文件目录中，根据用户给定的文件名寻找到对应文件的文件控制块（文件目录项）
+  通过文件控制块所记录的该文件的相关信息依次存取该文件的内容
+
+• 文件目录
+  1）文件目录：建立和维护的关于系统的所有文件的清单
+  2）文件控制块：每个目录项对应一个文件的信息描述（存取控制信息、结构信息、使用信息、管理信息）
+  3）目录文件：目录信息也以文件的形式存放
+
+• 树形目录结构
+
+3. 文件的物理结构
+• 文件在物理存储中的存放方法和组织关系
+  块（物理记录）的划分、记录的排列、索引的组织、信息的搜素
+• 常见的文件物理结构
+  顺序文件（连续存储）；链接文件；索引文件</code></pre>
+<h3 id="分布式文件系统-DFS"><a href="#分布式文件系统-DFS" class="headerlink" title="分布式文件系统(DFS)"></a>分布式文件系统(DFS)</h3><pre><code>1. 体系架构  
+• DFS实现的思路：  
+  1）保证每台机器均可透明地访问其他机器上的文件（通过RPC调用）  
+  2）将所有机器的文件系统关联起来，形成一个对外统一的整体  
+• Client-Server Architectures：文件系统的挂载  
+• Symmetric Architectures：通过特殊的hash算法将文件划分到各台机器上，需要访问文件时可根据hash算法进行定位
+• Cluster-Based Distributed File Systems  
+  主节点进行管理，从节点存储数据  
+  文件切分成块，分散存储在从节点上  
+
+2. 文件访问  
+• 单机多进程访问同一文件：读写锁  
+• 不同机器上进程访问同一文件  
+• 注意临界区问题  
+
+3. 备份与一致性  
+• 客户端备份：Client-Server DFS  
+• 服务器端备份：Cluster-Based DFS  
+
+4. 容错管理  </code></pre>
+<h3 id="Hadoop分布式文件系统-HDFS"><a href="#Hadoop分布式文件系统-HDFS" class="headerlink" title="Hadoop分布式文件系统(HDFS)"></a>Hadoop分布式文件系统(HDFS)</h3><pre><code>1. 设计考量
+• HDFS：Hadoop Distributed File System 分布式文件系统
+• MapReduce：并行计算框架
+• 文件由数据块集合组成，每个数据块在本地文件系统中以单独文件进行存储
+
+2. 体系结构</code></pre>
+<p><img src="/Distributed-System-1/202008052.png"></p>
+<pre><code>• NameNode(masters)：每个集群一个名字节点，负责文件系统元数据操作、数据块的复制和定位
+核心数据文件包括：元数据镜像文件、操作日志文件；元数据保存在内存中
+• SecondaryNameNode(backups)：NameNode的备份节点 （防止Log过大回恢复时间过长 冷备份/离线）
+“检查点”：定期从NameNode上下载镜像和日志，合并成新的，在本地保存，并写回NameNode
+• DataNodes(slaves)：集群中每个节点一个数据节点，负责数据块的存储；为客户端提供实际文件数据
+HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，并不占用整个数据块存储空间
+
+3. 文件访问
+• 文件写入HDFS
+  NameNode告知客户端文件的每一个数据块存储在何处，客户端将数据块直接传输到指定的数据节点
+• 数据存放策略（目标：负载均衡，快速访问，容错）
+  三个副本：当前DataNode（快速写入）、不同机架（减少跨rack的网络流量）、相同机架其他节点（应对交换机故障）
+  若有更多副本，随机节点
+• 数据读取策略：从NameNode获得数据块不同副本的存放位置列表，最近者优先原则
+• 文件访问模型：”一次写入多次读取“，不允许更改，仅容许追加；修改内容需删除重新写入;对于单文件只
+               支持并发读，不支持并发写
+  好处：避免读写冲突、无需文件锁
+
+4. 备份与一致性
+• HDFS数据备份优点
+  1）加快数据传输速度
+  2）容易检查数据错误
+  3）保证数据的可靠性
+• 一个文件有若干备份，写入成功的备份之间是强一致的
+
+5. 容错机制
+• DataNode故障：宕机，节点上所有的数据都会标记为不可读
+• 定期检查备份因子：NameNode侦测DataNode故障，数据块自动复制到剩余的节点以保证满足备份因子
+• NameNode故障：根据SecondaryNameNode中得FsImage和Editlog数据进行恢复</code></pre>
+]]></content>
+      <categories>
+        <category>系统</category>
+      </categories>
+      <tags>
+        <tag>分布式</tag>
+        <tag>笔记整理</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>论文阅读_LEARNING TO REPRESENT PROGRAMS WITH GRAPHS(ICLR2018)</title>
-    <url>/2020/09/08/ggnn/ggnn/</url>
+    <url>/2020/09/08/ggnn/</url>
     <content><![CDATA[<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在代码上进行任务学习，目前更多的是将自然语言的深度学习方法应用在代码上，这样会存在无法捕捉代码语义信息的问题，例如代码中变量、函数的长依赖在局部是难以学习到的。该文使用图来表达代码的语义和语法结构，使用基于图的深度学习方法来解释代码结构，增加了数据流和类型层级来弥补代码的语义损失。</p>
 <h3 id="研究内容"><a href="#研究内容" class="headerlink" title="研究内容"></a>研究内容</h3><ul>
 <li>如何构建源代码的程序图</li>
@@ -288,7 +313,7 @@ Map -&gt; 本地磁盘 -&gt; Reduce （I/O浪费、存储浪费）
 <li>VarNaming: 根据变量的用法预测变量名</li>
 <li>VarMisuse: 根据在程序中的定位选择正确的变量名</li>
 </ul>
-<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><h3 id="Graph-Structure"><a href="#Graph-Structure" class="headerlink" title="Graph Structure"></a>Graph Structure</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们用程序图来表示token之间的语法和语义关系，并且用不同类型的边来模拟token间的语法和语义关系。程序图的骨架是程序的抽象语法树(蓝色圆弧节点)，叶子结点表示为源码中的token(黑色方框)，如a图中所示，是”Assert.NotNull(clazz);”的表示。其中，共有两种有向边的形式：蓝线代表语义节点的连接，指向孩子节点；双黑线代表Token间的有序连接，指向下一个Token。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图b是增加的数据流信息，一共有3种边的类型，LastWrite/LastUse/ComputedFrom，表现了控制数据在程序中传递的流向。还有一些特殊的数据流类型用于图的扩展，例如LastLexicalUse, ReturnsTo,FormalArgName等。<br><img src="/2020/09/08/ggnn/ggnn/20200090801.png"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最后一点是，所有的节点和类型都double一下，便于网络中信息快速传播，但增加了模型建立的代价。</p>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><h3 id="Graph-Structure"><a href="#Graph-Structure" class="headerlink" title="Graph Structure"></a>Graph Structure</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们用程序图来表示token之间的语法和语义关系，并且用不同类型的边来模拟token间的语法和语义关系。程序图的骨架是程序的抽象语法树(蓝色圆弧节点)，叶子结点表示为源码中的token(黑色方框)，如a图中所示，是”Assert.NotNull(clazz);”的表示。其中，共有两种有向边的形式：蓝线代表语义节点的连接，指向孩子节点；双黑线代表Token间的有序连接，指向下一个Token。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图b是增加的数据流信息，一共有3种边的类型，LastWrite/LastUse/ComputedFrom，表现了控制数据在程序中传递的流向。还有一些特殊的数据流类型用于图的扩展，例如LastLexicalUse, ReturnsTo,FormalArgName等。<br><img src="/2020/09/08/ggnn/20200090801.png"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最后一点是，所有的节点和类型都double一下，便于网络中信息快速传播，但增加了模型建立的代价。</p>
 <h3 id="GGNN-Gated-Graph-Nerual-Network"><a href="#GGNN-Gated-Graph-Nerual-Network" class="headerlink" title="GGNN - Gated Graph Nerual Network"></a>GGNN - Gated Graph Nerual Network</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图G = (V,E,X)是由一系列节点V，节点特征X，以及一个有向边集合E组成，共有K个边的类型。  </p>
 <ul>
 <li>将每个节点v的特征表示为一个实值向量x，再将每个节点与一个状态向量h对应，用x来初始化，状态向量用于在图中传播消息，类型为k的消息会传播给v的邻居，消息是利用状态向量计算的，m=f(h)，这里f选用一个线性函数。  </li>
@@ -305,36 +330,11 @@ Map -&gt; 本地磁盘 -&gt; Reduce （I/O浪费、存储浪费）
 <li>VarNaming: 使用ABGLBL作为基准模型(使用每个变量用法的4个左右上下文标注的对数双线性模型)</li>
 <li>VarMisuse: 使用双向GRU作为基准模型，以AVGBIRNN作为加强版(对变量取平均)</li>
 </ul>
-<h3 id="Quantitative"><a href="#Quantitative" class="headerlink" title="Quantitative"></a>Quantitative</h3><p>两个任务的评估结果：<br><img src="/2020/09/08/ggnn/ggnn/20200090802.png"><br>下图是不同边和结点表示对结果的影响，从表中可以看出如果只保留语法信息会对varNaming任务产生很大影响。<br><img src="/2020/09/08/ggnn/ggnn/20200090803.png"> </p>
-<h3 id="Qualitative"><a href="#Qualitative" class="headerlink" title="Qualitative"></a>Qualitative</h3><p>下图展示了对不同位置的变量名预测的结果：<br><img src="/2020/09/08/ggnn/ggnn/20200090804.png"> </p>
+<h3 id="Quantitative"><a href="#Quantitative" class="headerlink" title="Quantitative"></a>Quantitative</h3><p>两个任务的评估结果：<br><img src="/2020/09/08/ggnn/20200090802.png"><br>下图是不同边和结点表示对结果的影响，从表中可以看出如果只保留语法信息会对varNaming任务产生很大影响。<br><img src="/2020/09/08/ggnn/20200090803.png"> </p>
+<h3 id="Qualitative"><a href="#Qualitative" class="headerlink" title="Qualitative"></a>Qualitative</h3><p>下图展示了对不同位置的变量名预测的结果：<br><img src="/2020/09/08/ggnn/20200090804.png"> </p>
 <p>使用VarMisuse还发现了开源项目中存在的变量命名误用bug，便于修正。</p>
 <h1 id="Conclusions"><a href="#Conclusions" class="headerlink" title="Conclusions"></a>Conclusions</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;虽然源代码在其他学科（如编程语言研究）中有很好的理解和研究，但它是深度学习的一个相对较新的领域。 与文本或知觉数据相比，它提供了新的角度，因为它的（本地）语义是明确定义的，并且可以使用众所周知的高效程序分析来提取丰富的附加信息。 另一方面，整合这些丰富的结构化信息带来了一个有趣的挑战。因为它需要概率地提炼类型系统中包含的标准信息， 我们认为它是学习源代码含义的核心挑战的第一个尝试。</p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>M. Allamanis, M. Brockschmidt, and M. Khademi, “Learning to represent programs with graphs,” in International Conference on Learning Representations, 2018.<br>Y. Li, D. Tarlow, M. Brockschmidt, and R. Zemel, “Gated graph sequence neural networks,” arXiv preprint arXiv:1511.05493, 2015.<br><a href="https://blog.csdn.net/m0_37924639/article/details/80499416">https://blog.csdn.net/m0_37924639/article/details/80499416</a><br><a href="https://zhuanlan.zhihu.com/p/36117802">https://zhuanlan.zhihu.com/p/36117802</a>  </p>
-]]></content>
-      <categories>
-        <category>Big Code</category>
-      </categories>
-      <tags>
-        <tag>paper</tag>
-        <tag>Code Naturalness</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CodeSearchDataset</title>
-    <url>/2020/09/24/CodeSearchDataset/CodeSearchDataset/</url>
-    <content><![CDATA[<h1 id="Code-Search数据集调研"><a href="#Code-Search数据集调研" class="headerlink" title="Code Search数据集调研"></a>Code Search数据集调研</h1><blockquote>
-<p>Code Search是代码任务中的一项关键问题，根据给出的Query文本匹配最接近的代码回答。例如，”How do i iterate through a hashmap?”，代码搜索模型会在代码语料库中进行搜索，返回匹配的代码段。根据[1]中的统计,近几年对于代码搜索模型的研究逐渐增多，任务对应的数据集也丰富起来，先后出现了多个数据集benchmark，这些benchmark的目的都在于想统一代码搜索任务的评估方式，但也都略有区别。近期对代码搜搜的任务进行了一些调研，在此做一个整理。</p>
-</blockquote>
-<h3 id="CODEnn-DataSet-2018"><a href="#CODEnn-DataSet-2018" class="headerlink" title="CODEnn DataSet (2018)"></a>CODEnn DataSet (2018)</h3><p>CODEnn数据集是DeepCS[2]系统所使用的大规模数据集，包含了代码和对应的文本表述，对应CODEnn模型的输入需要，数据集以&lt;method name, API dequence, tokens, description&gt;元组存储,该数据可在[8]上获取。<br><img src="/2020/09/24/CodeSearchDataset/CodeSearchDataset/2020092403.png"><br>CODEnn选取了Stack Overflow上高星的50个有关Java程序的提问，构造了代码搜索的查询测试集。</p>
-<p>由于数据集格式的固定，该数据集只够于以token方式处理代码的模型，因此存在一定的限制。</p>
-<h3 id="Nerual-Neural-Code-Search-Evaluation-Dataset-2019"><a href="#Nerual-Neural-Code-Search-Evaluation-Dataset-2019" class="headerlink" title="Nerual Neural Code Search Evaluation Dataset(2019)"></a>Nerual Neural Code Search Evaluation Dataset(2019)</h3><p>该数据集由Facebook于2019年推出，整个数据集分为三个部分：<br><strong>GitHub存储库</strong><br>由GitHub上近24549个星数最高的Android库的代码片段组成的搜索语料库，包含Python脚本。  </p>
-<p><strong>搜索语料库</strong><br>依靠前面的24549个库，解析其中的方法主体，总共包括4,716,814个。给到自然语言query后，代码搜索模型从中搜索出需要的代码片段。<br>每个方法主体已经给到了包括它的ID、文件路径、起始行、结束行、url等在内的相关信息。<br><img src="/2020/09/24/CodeSearchDataset/CodeSearchDataset/2020092404.png">  </p>
-<p><strong>评估数据集</strong><br>包含287个堆栈溢出问答对，包括其ID、问题、答案url、答案几个部分，这些问题来自Stack Exchange。</p>
-<p>目前，该团队基于这个数据集评估了NCS,UNIF两个模型，其中UNIF以简单的模型结构超过了CODEnn在代码搜索任务上的表现。在该数据集上，语料库的作用仅仅是训练代码的表征，当代码和文本使用同一表征模型时适用。如果需要有监督的训练，或进行bi-modal模型的训练，则必须要对语料库增加对应的文本描述。</p>
-<h3 id="CodeSearchNet-2020"><a href="#CodeSearchNet-2020" class="headerlink" title="CodeSearchNet(2020)"></a>CodeSearchNet(2020)</h3><p>GitHub发起了CodeSearchNet挑战赛，以推动用自然语言搜索程序代码的技术发展。CodeSearchNet语料库是一个庞大的程序代码和自然语言批注数据集，让研究人员可用来训练机器学习模型。该数据集收集了大量以Go、Java、JavaScript、PHP、Python和Ruby程序语言撰写的函式数据集，以及其说明文件，官方使用解析器TreeSitter作为基础架构，并发布了数据预处理工作管线，作为其他研究人员在程序代码中应用机器学习的起点。<br>数据集的组成如下图所示：<br><img src="/2020/09/24/CodeSearchDataset/CodeSearchDataset/2020092406.png"> </p>
-<p>CodeSearchNet是一个比较完善的代码搜索数据库，且有相对应的评估系统，目前有codebert、code2vec等模型在该数据及上进行代码搜索的任务学习。</p>
-<h3 id="CosBench-2020"><a href="#CosBench-2020" class="headerlink" title="CosBench(2020)"></a>CosBench(2020)</h3><p>tbc…</p>
-<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h4><p>[1]Are the Code Snippets What We Are Searching for?A Benchmark and an Empirical Study on CodeSearch with Natural-Language Queries<br>[2]Deep Code Search<br>[3]Nerual Neural Code Search Evaluation Dataset<br>[4]<a href="https://zhuanlan.zhihu.com/p/85159018">https://zhuanlan.zhihu.com/p/85159018</a><br>[5]<a href="https://github.com/facebookresearch/Neural-Code-Search-Evaluation-Dataset">https://github.com/facebookresearch/Neural-Code-Search-Evaluation-Dataset</a><br>[6]<a href="https://github.com/github/CodeSearchNet">https://github.com/github/CodeSearchNet</a><br>[7]<a href="https://wandb.ai/github/codesearchnet/benchmark">https://wandb.ai/github/codesearchnet/benchmark</a><br>[8]<a href="https://drive.google.com/drive/folders/1GZYLT_lzhlVczXjD6dgwVUvDDPHMB6L7">https://drive.google.com/drive/folders/1GZYLT_lzhlVczXjD6dgwVUvDDPHMB6L7</a></p>
 ]]></content>
       <categories>
         <category>Big Code</category>
