@@ -344,4 +344,57 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
         <tag>Code Naturalness</tag>
       </tags>
   </entry>
+  <entry>
+    <title>A_MultiPerspective_Architecture_for_Semantic_Code_Search</title>
+    <url>/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/</url>
+    <content><![CDATA[<h1 id="A-multi-perspective-architecture-for-semantic-code-search"><a href="#A-multi-perspective-architecture-for-semantic-code-search" class="headerlink" title="A multi-perspective architecture for semantic code search"></a>A multi-perspective architecture for semantic code search</h1><blockquote>
+<p>ACL 2020</p>
+</blockquote>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><ul>
+<li>Importance: 代码和文本描述的对应匹配是软件仓库的查询接口的基础</li>
+<li>Work: 提出一个多角度、跨语言的代码-文本匹配框架</li>
+<li>Result: 在CoNaLa数据集上的表现超过先前方法 </li>
+</ul>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>1）任务的目标 —— 给定一个文本查询，系统从代码库中返回一系列在关联程度上排序的代码段。</p>
+<p>2）任务的本质 —— 映射代码和文本嵌入到同一个向量空间中，使具有对应关系的两个向量在距离上接近。</p>
+<p>3）本文的动机 —— 现有模型在最后一步计算相似度前都没有显式地衡量过代码和文本描述之间的交互</p>
+<blockquote>
+<p>以往的模型<strong>分开</strong>表征代码和文本的向量，在最后计算相似度时才会联系两个输入。</p>
+</blockquote>
+<h2 id="2-Background"><a href="#2-Background" class="headerlink" title="2. Background"></a>2. Background</h2><p>1）**”cross-modal ranking problem”**</p>
+<p>一次查询可能返回多个编程语言匹配的结果，目前的标准方法是不同语言对应不同的模型映射到同一向量空间下，再进行比较。</p>
+<p>2）**”joint embedding &amp; special code embedding”**</p>
+<p>当前的代码搜索模型主要有两种形式：代码和文本用同一嵌入方法表示，向量直接位于同一空间；利用代码更有效的抽象表示分开嵌入。</p>
+<h2 id="3-Model"><a href="#3-Model" class="headerlink" title="3. Model"></a>3. Model</h2><p>1）CT —— A Baseline Code and Text Model (Codenn)</p>
+<ul>
+<li>代码 + 文本</li>
+<li>Word Embedding Module * 2: pre-trained的token向量表示</li>
+<li>Context Representation Module * 2: biLSTM得到hidden维度的sequences向量表示</li>
+<li>Maxpool Layer * 2: 将sequences的向量在每个维度上分别聚合，得到一个整体向量</li>
+<li>Similarity Module: code vector和nl vector 间的L2距离</li>
+</ul>
+<p>2）CAT —— An AST-based Model</p>
+<ul>
+<li>代码 + AST 遍历序列 + 文本</li>
+<li>Word Embedding Module * 3</li>
+<li>Context Representation Module * 3</li>
+<li>Maxpool Layer * 3</li>
+<li>Similarity Module: [ code vector : ast vector ] 和 [ nl vector : nl vector ] (concat) 间的L2距离</li>
+</ul>
+<ol start="3">
+<li>MP —— A Multi-Perspective Model</li>
+</ol>
+<blockquote>
+<p>前两个模型的问题：只通过最后一个Similarity Module才将代码表示和文本表示关联起来。在Wang et al.(2017)一文中指出，对于需要比较同一语言的两段文本时，如果能在计算向量表征时涵盖两个输入序列中一些不同的local matching operations(<strong>Position</strong>)，那么将会是有益的。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Big Code</category>
+      </categories>
+      <tags>
+        <tag>paper</tag>
+        <tag>Code Naturalness</tag>
+        <tag>Code Search</tag>
+      </tags>
+  </entry>
 </search>
