@@ -345,11 +345,9 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
       </tags>
   </entry>
   <entry>
-    <title>A_MultiPerspective_Architecture_for_Semantic_Code_Search</title>
+    <title>论文阅读_A Multi-Perspective Architecture for Semantic Code Search(ACL2020)</title>
     <url>/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/</url>
-    <content><![CDATA[<h1 id="A-multi-perspective-architecture-for-semantic-code-search"><a href="#A-multi-perspective-architecture-for-semantic-code-search" class="headerlink" title="A multi-perspective architecture for semantic code search"></a>A multi-perspective architecture for semantic code search</h1><blockquote>
-<p>ACL 2020</p>
-</blockquote>
+    <content><![CDATA[<p>论文地址：<a href="https://www.aclweb.org/anthology/2020.acl-main.758.pdf">https://www.aclweb.org/anthology/2020.acl-main.758.pdf</a></p>
 <h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><ul>
 <li>Importance: 代码和文本描述的对应匹配是软件仓库的查询接口的基础</li>
 <li>Work: 提出一个多角度、跨语言的代码-文本匹配框架</li>
@@ -359,11 +357,11 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 <p>2）任务的本质 —— 映射代码和文本嵌入到同一个向量空间中，使具有对应关系的两个向量在距离上接近。</p>
 <p>3）本文的动机 —— 现有模型在最后一步计算相似度前都没有显式地衡量过代码和文本描述之间的交互</p>
 <blockquote>
-<p>以往的模型<strong>分开</strong>表征代码和文本的向量，在最后计算相似度时才会联系两个输入。</p>
+<p>以往的模型<strong>分开</strong>表征代码和文本的向量，在最后计算相似度时才会联系两个输入。(说明在3(3))</p>
 </blockquote>
-<h2 id="2-Background"><a href="#2-Background" class="headerlink" title="2. Background"></a>2. Background</h2><p>1）**”cross-modal ranking problem”**</p>
+<h2 id="2-Background"><a href="#2-Background" class="headerlink" title="2. Background"></a>2. Background</h2><p>1）<strong>cross-modal ranking problem</strong></p>
 <p>一次查询可能返回多个编程语言匹配的结果，目前的标准方法是不同语言对应不同的模型映射到同一向量空间下，再进行比较。</p>
-<p>2）**”joint embedding &amp; special code embedding”**</p>
+<p>2）<strong>joint embedding &amp; special code embedding</strong></p>
 <p>当前的代码搜索模型主要有两种形式：代码和文本用同一嵌入方法表示，向量直接位于同一空间；利用代码更有效的抽象表示分开嵌入。</p>
 <h2 id="3-Model"><a href="#3-Model" class="headerlink" title="3. Model"></a>3. Model</h2><p>1）CT —— A Baseline Code and Text Model (Codenn)</p>
 <ul>
@@ -387,6 +385,46 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 <blockquote>
 <p>前两个模型的问题：只通过最后一个Similarity Module才将代码表示和文本表示关联起来。在Wang et al.(2017)一文中指出，对于需要比较同一语言的两段文本时，如果能在计算向量表征时涵盖两个输入序列中一些不同的local matching operations(<strong>Position</strong>)，那么将会是有益的。</p>
 </blockquote>
+<ul>
+<li><p>Word Embedding Module * 3 + Context Representation Module * 3</p>
+</li>
+<li><p>Bilateral Multi-Perspective  Matching(BiMPM) Module   <a href="https://github.com/rajarshihaldar/codetextmatch/blob/master/src/models.py">https://github.com/rajarshihaldar/codetextmatch/blob/master/src/models.py</a></p>
+<p>对于两个序列表征 P and Q 进行比较，把P中的每个位置对应到Q中的所有位置，再把Q中的每个位置对应到P中的所有位置。通过四种不同的匹配策略（前向网络），对P中每个token i会得到新的序列表征。</p>
+<ul>
+<li>Full matching: dense + cosine</li>
+<li>Maxpool matching: dense + normalization + matmul + normalization </li>
+<li>Attentive matching: dense + attention + normalization  + full_matching</li>
+<li>Max-Attentive matching: dense + attention + max +full_matching</li>
+</ul>
+<blockquote>
+<p>这部分在论文里并没有详细说明，可以看Wang et al.(2017)来进行知识补充。根据源码来看，文本和代码的交互的本质就是乘法机制或者<strong>注意力机制</strong>。</p>
+</blockquote>
+</li>
+<li><p>Local Aggregation Module: 使用BiLSTM取final hidden state</p>
+</li>
+<li><p>Similarity Module</p>
+</li>
+</ul>
+<p>4） MP-CAT: A Combined Model</p>
+<ul>
+<li>Global and Local Fusion Module: 将前两个模型方法得到的向量进行concat作为整体的code vector</li>
+</ul>
+<p>完整架构如下图：</p>
+<p><img src="/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/A-MultiPerspective-Architecture-for-Semantic-Code-Search%5Cimage-20210325211309617.png" alt="image-20210325211309617"></p>
+<h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h2><ul>
+<li><p>数据集：The CoNaLa Dataset (python)</p>
+</li>
+<li><p>损失函数：代码搜索任务中常用的pairwise ranking loss</p>
+</li>
+<li><p>结果：</p>
+<img src="/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/image-20210325212117336.png" alt="image-20210325212117336" style="zoom:50%;">
+
+</li>
+</ul>
+<blockquote>
+<p>实验结果无疑是MP-CAT最好，但是表格中显示出CAT优于MP，所以在MP-CAT中更dominant的还是CAT的组件？MP对于Code Search任务的Improvement好像没有显著的在该文中表示。</p>
+</blockquote>
+<h2 id="5-Conclusions"><a href="#5-Conclusions" class="headerlink" title="5. Conclusions"></a>5. Conclusions</h2><p>结论写法与开篇一致。</p>
 ]]></content>
       <categories>
         <category>Big Code</category>
