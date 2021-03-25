@@ -409,7 +409,8 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 <li>Global and Local Fusion Module: 将前两个模型方法得到的向量进行concat作为整体的code vector</li>
 </ul>
 <p>完整架构如下图：</p>
-<p><img src="/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/A-MultiPerspective-Architecture-for-Semantic-Code-Search%5Cimage-20210325211309617.png" alt="image-20210325211309617"></p>
+<img src="/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/image-20210325211309617.png" alt="image-20210325211309617" style="zoom:67%;">
+
 <h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h2><ul>
 <li><p>数据集：The CoNaLa Dataset (python)</p>
 </li>
