@@ -347,8 +347,7 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
   <entry>
     <title>论文阅读_A Multi-Perspective Architecture for Semantic Code Search(ACL2020)</title>
     <url>/2021/03/24/A-MultiPerspective-Architecture-for-Semantic-Code-Search/</url>
-    <content><![CDATA[<p>论文地址：<a href="https://www.aclweb.org/anthology/2020.acl-main.758.pdf">https://www.aclweb.org/anthology/2020.acl-main.758.pdf</a></p>
-<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><ul>
+    <content><![CDATA[<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><ul>
 <li>Importance: 代码和文本描述的对应匹配是软件仓库的查询接口的基础</li>
 <li>Work: 提出一个多角度、跨语言的代码-文本匹配框架</li>
 <li>Result: 在CoNaLa数据集上的表现超过先前方法 </li>
@@ -425,6 +424,7 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 <p>实验结果无疑是MP-CAT最好，但是表格中显示出CAT优于MP，所以在MP-CAT中更dominant的还是CAT的组件？MP对于Code Search任务的Improvement好像没有显著的在该文中表示。</p>
 </blockquote>
 <h2 id="5-Conclusions"><a href="#5-Conclusions" class="headerlink" title="5. Conclusions"></a>5. Conclusions</h2><p>结论写法与开篇一致。</p>
+<p>论文地址：<a href="https://www.aclweb.org/anthology/2020.acl-main.758.pdf">https://www.aclweb.org/anthology/2020.acl-main.758.pdf</a></p>
 ]]></content>
       <categories>
         <category>Big Code</category>
