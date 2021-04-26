@@ -382,12 +382,12 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
 <li>MP —— A Multi-Perspective Model</li>
 </ol>
 <blockquote>
-<p>前两个模型的问题：只通过最后一个Similarity Module才将代码表示和文本表示关联起来。在Wang et al.(2017)一文中指出，对于需要比较同一语言的两段文本时，如果能在计算向量表征时涵盖两个输入序列中一些不同的local matching operations(<strong>Position</strong>)，那么将会是有益的。</p>
+<p>前两个模型的问题：只通过最后一个Similarity Module才将代码表示和文本表示关联起来。在<a href="https://doi.org/10.24963/ijcai.2017/579">Wang et al.(2017)</a>一文中指出，对于需要比较同一语言的两段文本时，如果能在计算向量表征时涵盖两个输入序列中一些不同的local matching operations(<strong>Position</strong>)，那么将会是有益的。</p>
 </blockquote>
 <ul>
 <li><p>Word Embedding Module * 3 + Context Representation Module * 3</p>
 </li>
-<li><p>Bilateral Multi-Perspective  Matching(BiMPM) Module   <a href="https://github.com/rajarshihaldar/codetextmatch/blob/master/src/models.py">https://github.com/rajarshihaldar/codetextmatch/blob/master/src/models.py</a></p>
+<li><p>Bilateral Multi-Perspective  Matching(BiMPM) Module   实现: <a href="https://github.com/rajarshihaldar/codetextmatch/blob/master/src/models.py">https://github.com/rajarshihaldar/codetextmatch/blob/master/src/models.py</a></p>
 <p>对于两个序列表征 P and Q 进行比较，把P中的每个位置对应到Q中的所有位置，再把Q中的每个位置对应到P中的所有位置。通过四种不同的匹配策略（前向网络），对P中每个token i会得到新的序列表征。</p>
 <ul>
 <li>Full matching: dense + cosine</li>
@@ -434,6 +434,166 @@ HDFS默认Block大小是64MB；若一个文件小于一个数据块的大小，�
         <tag>paper</tag>
         <tag>Code Naturalness</tag>
         <tag>Code Search</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>sigcse_CodeAnalysis</title>
+    <url>/2021/04/14/sigcse-CodeAnalysis/</url>
+    <content><![CDATA[<h2 id="SIGCSE计算机教育论文集-Session-Code-Analysis"><a href="#SIGCSE计算机教育论文集-Session-Code-Analysis" class="headerlink" title="SIGCSE计算机教育论文集 Session: Code Analysis"></a>SIGCSE计算机教育论文集 Session: Code Analysis</h2><blockquote>
+<p>近3年论文选读 + 简要整理</p>
+</blockquote>
+<h3 id="Concise-Graphical-Representations-of-Student-Effort-on-Weekly-Many-Small-Programs-2021"><a href="#Concise-Graphical-Representations-of-Student-Effort-on-Weekly-Many-Small-Programs-2021" class="headerlink" title="Concise Graphical Representations of Student Effort on Weekly Many Small Programs (2021)"></a>Concise Graphical Representations of Student Effort on Weekly Many Small Programs (2021)</h3>]]></content>
+  </entry>
+  <entry>
+    <title>Adversarial_Robustness_for_Code</title>
+    <url>/2021/03/29/Adversarial-Robustness-for-Code/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>【笔记】CS234_强化学习_01</title>
+    <url>/2021/04/26/CS234-RL-01/</url>
+    <content><![CDATA[<h1 id="Lecture-1-Introduction-to-RL"><a href="#Lecture-1-Introduction-to-RL" class="headerlink" title="Lecture 1: Introduction to RL"></a>Lecture 1: Introduction to RL</h1><blockquote>
+<p>Make good sequences of decisions</p>
+</blockquote>
+<h2 id="Overview-of-reinforcement-learning"><a href="#Overview-of-reinforcement-learning" class="headerlink" title="Overview of reinforcement learning"></a>Overview of reinforcement learning</h2><p>实例引入：机器人操作序列决策</p>
+<h3 id="Reinforcement-Learning-Involves-（介绍RL的特点）"><a href="#Reinforcement-Learning-Involves-（介绍RL的特点）" class="headerlink" title="Reinforcement Learning Involves （介绍RL的特点）"></a>Reinforcement Learning Involves （介绍RL的特点）</h3><ul>
+<li><p>Optimization - 决策的优化问题</p>
+<blockquote>
+<p>此处优化问题与梯度下降等优化算法进行区分，是策略的优化，而非行为的优化。</p>
+</blockquote>
+</li>
+<li><p>Delayed consequences - 一次决策影响的是之后的长期过程，并非是即时反馈</p>
+<p>Two challenges：</p>
+<ul>
+<li>When planning: decisions involve reasoning about not just immediate benefit of a decision but also its longer term ramifications</li>
+<li>When learning: temporal credit assignment is hard (what caused later<br>high or low rewards?)</li>
+</ul>
+</li>
+<li><p>Exploration - 强化学习是探索的过程，逐步积累经验和知识</p>
+</li>
+<li><p>Generalization - 要拥有泛化能力</p>
+<p>为什么不提前制定好策略？ </p>
+<ul>
+<li>样本空间太大，只能通过泛化</li>
+</ul>
+</li>
+</ul>
+<h3 id="RL-vs-Other-AI-and-Machine-Learning（将RL与其它的AI-Learning进行区分）"><a href="#RL-vs-Other-AI-and-Machine-Learning（将RL与其它的AI-Learning进行区分）" class="headerlink" title="RL vs Other AI and Machine Learning（将RL与其它的AI Learning进行区分）"></a>RL vs Other AI and Machine Learning（将RL与其它的AI Learning进行区分）</h3><img src="/2021/04/26/CS234-RL-01/image-20210426180127441.png" alt="image-20210426180127441" style="zoom:50%;">
+
+<ul>
+<li><p>AI Planning 规划问题：物流调度、Alpha Go</p>
+<blockquote>
+<p>The idea of planning is that you’re given a model of how the world works!</p>
+</blockquote>
+</li>
+<li><p>SL 监督学习：分类、回归</p>
+</li>
+<li><p>UL无监督学习：聚类、降维</p>
+<blockquote>
+<p>不涉及Optimization，前面解释过这里的优化不是行为优化而是策略优化；</p>
+<p>不涉及Delayed Consequences，一般训练模型直接得到结果；</p>
+<p>不涉及Exploration，直接给定标签或特征进行学习。</p>
+</blockquote>
+</li>
+<li><p>IL模仿学习</p>
+<blockquote>
+<p>模仿专家决策，无需探索<br>存在交叉：</p>
+</blockquote>
+<ul>
+<li><p>模仿 &amp; 监督，标签即为模仿对象的行为</p>
+</li>
+<li><p>模仿 &amp; 强化，每步决策时，并非每步都收到reward，若reward稀疏，利用专家指导/模仿应该怎么做</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Other-Issues"><a href="#Other-Issues" class="headerlink" title="Other Issues"></a>Other Issues</h3><ul>
+<li>鲁棒性问题：即便reward反馈出现错误，可以排除干扰，继续策略学习</li>
+</ul>
+<h2 id="Introduction-to-sequential-decision-making-under-uncertainty"><a href="#Introduction-to-sequential-decision-making-under-uncertainty" class="headerlink" title="Introduction to sequential decision making under uncertainty"></a>Introduction to sequential decision making under uncertainty</h2><h3 id="AI-Tutor-as-a-Decision-Process-一个例子"><a href="#AI-Tutor-as-a-Decision-Process-一个例子" class="headerlink" title="AI Tutor as a Decision Process(一个例子)"></a>AI Tutor as a Decision Process(一个例子)</h3><p>初始时，学生不知道加法（easier）和减法（harder）；tutor提供关于加法或减法的练习题序列；学习策略是，如果学生答对，则reward+1，答错则reward-1。</p>
+<ul>
+<li>根据目前的策略，学生最终会学到加法和减法吗？  只要答对简单的加法就可以获得reward，所以学生会答对加法，而永远学不会减法。</li>
+<li>如何才能学会加法和减法呢？增加答对减法的奖励值或答错减法的扣除值。</li>
+</ul>
+<h3 id="Sequential-Decision-Making"><a href="#Sequential-Decision-Making" class="headerlink" title="Sequential Decision Making"></a>Sequential Decision Making</h3><img src="/2021/04/26/CS234-RL-01/image-20210426202608939.png" alt="image-20210426202608939" style="zoom:50%;">
+
+<p>上图以离散时间的决策过程为例，整个决策过程构成一个闭环，不断循环。</p>
+<ul>
+<li><p>目标：Select actions to maximize total expected future reward</p>
+<blockquote>
+<p>可能需要平衡当下和长期reward收益</p>
+</blockquote>
+</li>
+<li><p>在每个时间步t：</p>
+<ul>
+<li>Agent(智能体) 做出一个行动a_t</li>
+<li>World(周围环境)根据a_t，生成得到观察值o_t和奖赏值r_t</li>
+<li>Agent接收o_t和r_t，做出新的行动</li>
+</ul>
+</li>
+<li><p>History / Experience</p>
+<ul>
+<li>过去时间的a_t，o_t，r_t的记录</li>
+</ul>
+</li>
+<li><p>State(s_t)</p>
+<ul>
+<li><p><strong>World State</strong> is information assumed to determine what happens next and determine how world generates next observation and reward.</p>
+<blockquote>
+<p>真实环境的状态可能是隐藏或不可知的</p>
+</blockquote>
+</li>
+<li><p><strong>Agent State</strong> is generally a function of the history.</p>
+<blockquote>
+<p>agent根据history来做出行动</p>
+</blockquote>
+</li>
+</ul>
+<p>总体来说，state描述agent和world的一些特点（可以类比于表征学习中的表征）。</p>
+</li>
+</ul>
+<h3 id="Markov-Assumption-对state和history建立关系"><a href="#Markov-Assumption-对state和history建立关系" class="headerlink" title="Markov Assumption(对state和history建立关系)"></a>Markov Assumption(对state和history建立关系)</h3><p>回顾马尔科夫性质：“已知现在，将来和过去无关”</p>
+<img src="/2021/04/26/CS234-RL-01/image-20210426205512380.png" alt="image-20210426205512380" style="zoom:50%;">
+
+<p>在Sequential Decision Making中，马尔科夫性满足s_t = h_t；</p>
+<p>进一步假设，大部分最近观察值已经足够表示历史的信息：</p>
+<ul>
+<li><p>若观察值对智能体完全可见，即s_t = o_t</p>
+</li>
+<li><p>若部分可观察，s_t 需要重新建模</p>
+</li>
+</ul>
+<h3 id="RL-Algorithm-Components"><a href="#RL-Algorithm-Components" class="headerlink" title="RL Algorithm Components"></a>RL Algorithm Components</h3><ul>
+<li><p>MDP <strong>Model</strong>: Agent’s representation of how world changes given agent’s action</p>
+<ul>
+<li><p>转移模型/转移概率矩阵</p>
+<img src="/2021/04/26/CS234-RL-01/image-20210426210905729.png" alt="image-20210426210905729" style="zoom:50%;">
+</li>
+<li><p>奖赏模型（计算<strong>期望</strong>）</p>
+<img src="/2021/04/26/CS234-RL-01/image-20210426210946814.png" alt="image-20210426210946814" style="zoom:50%;">
+</li>
+</ul>
+</li>
+<li><p><strong>Policy</strong>：可以看作一个映射函数，从状态映射到行动</p>
+</li>
+<li><p><strong>Value</strong> Function：值函数，代表累计的长期奖赏收益</p>
+</li>
+</ul>
+<p>不同类别的RL Agents</p>
+<img src="/2021/04/26/CS234-RL-01/image-20210426211343373.png" alt="image-20210426211343373" style="zoom: 50%;">
+
+<p>两个基本问题：Evaluation &amp;control </p>
+<ul>
+<li>Evaluation： 根据给定policy，预测期望收益</li>
+<li>Control：找到最优policy</li>
+</ul>
+<p>RL采用交替式学习模式</p>
+]]></content>
+      <categories>
+        <category>Notes</category>
+      </categories>
+      <tags>
+        <tag>强化学习 - 基础技术</tag>
       </tags>
   </entry>
 </search>
